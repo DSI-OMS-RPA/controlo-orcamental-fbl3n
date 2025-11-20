@@ -167,7 +167,7 @@ def detect_and_convert_numeric_columns(df: pd.DataFrame, sample_size: int = 100)
             if re.match(r'^-?\d{1,3}(?:\.\d{3})*,\d+$|^-?\d+,\d+$', value):
                 portuguese_comma_count += 1
                 numeric_count += 1
-                logger.debug(f"    Portuguese comma: {value}")
+                #logger.debug(f"    Portuguese comma: {value}")
             # Possible Portuguese thousands (X.XXX format where result >= 1000)
             elif re.match(r'^-?\d{1,4}\.\d{3}$', value):
                 test_val = value.replace('.', '')
@@ -175,22 +175,22 @@ def detect_and_convert_numeric_columns(df: pd.DataFrame, sample_size: int = 100)
                     if int(test_val) >= 1000:
                         portuguese_dot_count += 1
                         numeric_count += 1
-                        logger.debug(f"    Portuguese thousands: {value}")
+                        #logger.debug(f"    Portuguese thousands: {value}")
                     else:
                         english_count += 1
                         numeric_count += 1
-                        logger.debug(f"    English decimal: {value}")
+                        #logger.debug(f"    English decimal: {value}")
                 except ValueError:
                     pass
             # Clear English format with comma thousands
             elif re.match(r'^-?\d{1,3}(?:,\d{3})*\.\d+$', value):
                 english_count += 1
                 numeric_count += 1
-                logger.debug(f"    English thousands: {value}")
+                #logger.debug(f"    English thousands: {value}")
             # Simple numbers (integers or simple decimals)
             elif re.match(r'^-?\d+$|^-?\d+\.\d{1,2}$', value):
                 numeric_count += 1
-                logger.debug(f"    Simple number: {value}")
+                # logger.debug(f"    Simple number: {value}")
 
         # Decision logic: convert if we have significant numeric content
         threshold = max(1, len(string_values) * 0.2)  # 20% threshold

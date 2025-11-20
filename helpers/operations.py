@@ -1346,7 +1346,7 @@ def process_all_data(df, dmkbi_crud, table_name, columns=None):
         bool: True if successful
     """
     # Step 1: Fix any encoding issues in the data
-    logger.info("Fixing encoding issues in the data...")
+    #logger.info("Fixing encoding issues in the data...")
     fixed_df = fix_encoding_issues(df)
 
     # Step 2: Apply the ultra-safe insertion process

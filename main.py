@@ -259,7 +259,7 @@ async def main():
             if directory_path:
                 try:
                     logger.info(f"Cleaning up temporary files in: {directory_path}")
-                    # Implement file cleanup if needed
+                    clean_files_in_directory(directory_path)
                     logger.info("Temporary files cleaned up.")
                 except Exception as e:
                     logger.warning(f"Error cleaning up files: {e}")
