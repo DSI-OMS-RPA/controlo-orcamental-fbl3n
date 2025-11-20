@@ -1378,6 +1378,12 @@ def delete_existing_data(crud, table):
         bool: True if deletion was successful
     """
     try:
+
+        # check table exist
+        if not crud.table_exists(table):
+            logger.warning(f"Table '{table}' does not exist.")
+            return False
+
         delete_query = f"DELETE FROM {table}"
         result = crud.execute_raw_query(delete_query)
         if result is not None:

@@ -643,6 +643,136 @@ class SQLServerGenericCRUD:
     def cleanup_values(self, values, columns, column_types=None, logger=None):
         """Enhanced data validation and cleanup with Portuguese number support"""
         from helpers.number_converter import convert_portuguese_to_english_number
+        import pandas as pd
+
+        cleaned_values = []
+        problem_rows = []
+
+        for row_idx, row in enumerate(values):
+            cleaned_row = []
+            row_has_problems = False
+
+            for col_idx, val in enumerate(row):
+                col_name = columns[col_idx] if col_idx < len(columns) else f"column_{col_idx}"
+                try:
+                    # Handle None values
+                    if val is None or (isinstance(val, str) and val.strip() == ''):
+                        cleaned_row.append(None)
+                        continue
+
+                    # CRITICAL FIX: Check for pandas NaT (Not a Time) before strftime
+                    # NaT is a special Pandas type that doesn't support strftime()
+                    if pd.isna(val):
+                        cleaned_row.append(None)
+                        continue
+
+                    # Get column type if available
+                    col_type = None
+                    if column_types and col_name in column_types:
+                        col_type = column_types[col_name].upper()
+
+                    # Convert based on column type
+                    if col_type and 'INT' in col_type:
+                        # For integer columns
+                        if isinstance(val, str):
+                            val = val.strip()
+                            if val == '':
+                                cleaned_row.append(None)
+                            else:
+                                converted = convert_portuguese_to_english_number(val)
+                                if isinstance(converted, (int, float)):
+                                    cleaned_row.append(int(converted))
+                                else:
+                                    cleaned_row.append(0)
+                        else:
+                            cleaned_row.append(int(val) if val is not None else None)
+
+                    elif col_type and any(t in col_type for t in ['FLOAT', 'DECIMAL', 'NUMERIC', 'REAL']):
+                        # For float columns
+                        if isinstance(val, str):
+                            val = val.strip()
+                            if val == '':
+                                cleaned_row.append(None)
+                            else:
+                                converted = convert_portuguese_to_english_number(val)
+                                if isinstance(converted, (int, float)):
+                                    cleaned_row.append(float(converted))
+                                else:
+                                    cleaned_row.append(0.0)
+                        else:
+                            cleaned_row.append(float(val) if val is not None else None)
+
+                    elif col_type and any(t in col_type for t in ['DATE', 'DATETIME']):
+                        # For date columns - SAFE: Check NaT and None first!
+                        import pandas as pd
+
+                        # Check for pandas NaT (Not a Time) BEFORE trying strftime
+                        if pd.isna(val):
+                            cleaned_row.append(None)
+                        elif isinstance(val, (datetime, date)):
+                            # Only format if it's a valid datetime/date object
+                            if isinstance(val, datetime):
+                                cleaned_row.append(val.strftime('%Y-%m-%d %H:%M:%S'))
+                            else:
+                                cleaned_row.append(val.strftime('%Y-%m-%d'))
+                        elif isinstance(val, str):
+                            val = val.strip()
+                            if val == '':
+                                cleaned_row.append(None)
+                            else:
+                                # Try multiple date formats
+                                for fmt in ['%Y-%m-%d', '%d.%m.%Y', '%d/%m/%Y']:
+                                    try:
+                                        date_val = datetime.strptime(val, fmt)
+                                        cleaned_row.append(date_val)
+                                        break
+                                    except ValueError:
+                                        continue
+                                else:
+                                    # If no format works, use None
+                                    if logger:
+                                        logger.debug(f"Invalid date '{val}' in column '{col_name}' at row {row_idx+1} - using NULL")
+                                    cleaned_row.append(None)
+                        else:
+                            cleaned_row.append(None)
+
+                    else:
+                        # For string/other columns
+                        if isinstance(val, str):
+                            clean_str = val.replace('\x00', '').replace('\x1a', '')
+                            cleaned_row.append(clean_str)
+                        else:
+                            cleaned_row.append(str(val) if val is not None else None)
+
+                except AttributeError as e:
+                    # This catches NaTType.strftime() error
+                    if "NaTType" in str(e) or "does not support strftime" in str(e):
+                        # Silently handle NaT by converting to None
+                        cleaned_row.append(None)
+                    else:
+                        if logger:
+                            logger.warning(f"Attribute error in column '{col_name}' at row {row_idx+1}: {str(e)}")
+                        cleaned_row.append(None)
+                        row_has_problems = True
+
+                except Exception as e:
+                    if logger:
+                        logger.warning(f"Error processing value '{val}' in column '{col_name}' at row {row_idx+1}: {str(e)}")
+                    cleaned_row.append(None)
+                    row_has_problems = True
+
+            cleaned_values.append(tuple(cleaned_row))
+            if row_has_problems:
+                problem_rows.append(row_idx)
+
+        if logger and problem_rows:
+            logger.debug(f"Found {len(problem_rows)} rows with minor issues (handled gracefully): {problem_rows[:10]}...")
+
+        return cleaned_values
+
+    def cleanup_values_and_validate(self, values, columns, column_types=None, logger=None):
+        """Enhanced data validation and cleanup with Portuguese number support"""
+        from helpers.number_converter import convert_portuguese_to_english_number
 
         cleaned_values = []
         problem_rows = []
@@ -849,7 +979,7 @@ class SQLServerGenericCRUD:
                         cleaned_row.append(str(val))
 
                 except Exception as e:
-                    logger.warning(f"Error cleaning value in row {row_idx}, column '{col_name}': {str(e)}")
+                    #logger.warning(f"Error cleaning value in row {row_idx}, column '{col_name}': {str(e)}")
                     cleaned_row.append(None)
 
             cleaned_values.append(tuple(cleaned_row))

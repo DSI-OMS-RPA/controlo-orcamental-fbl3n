@@ -629,8 +629,6 @@ class SapGui():
             runtime = datetime.now().strftime("%Y%m%d%H%M%S")
             logger.info(f"Start date: {start_date} and End date: {end_date}")
 
-            input("Press...0")
-
             # Wait for element to be present
             element_to_wait_for = "wnd[0]/tbar[1]/btn[8]"
             if self.wait_for_element(element_to_wait_for):
@@ -638,8 +636,6 @@ class SapGui():
                 # Prepare client accounts list to copy and paste
                 client_accounts_str = "\r\n".join(client_accounts)
                 self.set_clipboard(client_accounts_str)
-
-                input("Press...1")
 
                 # insert "Conta do cliente"
                 self.session.findById("wnd[0]/usr/btn%_SD_SAKNR_%_APP_%-VALU_PUSH").press()
@@ -649,8 +645,6 @@ class SapGui():
                 # Clean input field "Aberto á data fixada"
                 self.session.findById("wnd[0]/usr/ctxtPA_STIDA").text = ""
 
-                input("Press...2")
-
                 # Select "Todas as partidas"
                 self.session.findById("wnd[0]/usr/radX_AISEL").select()
 
@@ -658,17 +652,11 @@ class SapGui():
                 self.session.findById("wnd[0]/usr/ctxtSO_BUDAT-LOW").text = start_date
                 self.session.findById("wnd[0]/usr/ctxtSO_BUDAT-HIGH").text = end_date
 
-                input("Press...2.1")
-
                 # Choose "Layout"
                 self.session.findById("wnd[0]/usr/ctxtPA_VARI").text = "/EXTRACTO_BI"
 
-                input("Press...3")
-
                 # Press execute button
                 self.session.findById("wnd[0]/tbar[1]/btn[8]").press()
-
-                input("Press...4")
 
                 # Wait 3 seconds for the template to load
                 time.sleep(3)
@@ -676,8 +664,6 @@ class SapGui():
                 # Wait for element to be present
                 element_to_wait_for = "wnd[0]/tbar[1]/btn[43]"
                 if self.wait_for_element(element_to_wait_for):
-
-                    input("Press...5")
 
                     # Choose menu to export data - "Lista > Exportar > Filelocal"
                     self.session.findById("wnd[0]/mbar/menu[0]/menu[3]/menu[2]").select()

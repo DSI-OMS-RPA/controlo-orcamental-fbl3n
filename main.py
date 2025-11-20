@@ -24,7 +24,7 @@ from helpers.email_sender import EmailSender
 logger = setup_logger(__name__)
 
 SEND_EMAIL = True  # Set to True to enable email notifications
-
+DELETE_DATA = True  # Set to True to enable data deletion before insertion
 
 @timed
 async def main():
@@ -183,11 +183,12 @@ async def main():
                     df[col] = df[col].fillna(0)
 
                 # Step 6: Delete existing data before insert
-                try:
-                    delete_existing_data(crud=dmkbi_crud, table=config.table)
-                except Exception as e:
-                    logger.error(f"Error deleting existing data: {str(e)}")
-                    raise
+                if DELETE_DATA:
+                    try:
+                        delete_existing_data(crud=dmkbi_crud, table=config.table)
+                    except Exception as e:
+                        logger.error(f"Error deleting existing data: {str(e)}")
+                        raise
 
                 # Step 7: Prepare and insert data
                 try:
