@@ -1,0 +1,14 @@
+Jinja2==3.1.6
+pandas==2.3.0
+psutil==6.0.0
+psycopg2==2.9.9
+psycopg2_binary==2.9.9
+PyGetWindow==0.0.9
+pyodbc==5.2.0
+python-dotenv==1.1.0
+python_dateutil==2.9.0.post0
+pywin32==308
+pywinauto==0.6.9
+Requests==2.32.4
+tqdm==4.66.4
+chardet==5.2.0

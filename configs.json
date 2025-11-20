@@ -1,0 +1,50 @@
+{
+    "process": {
+        "name": "Extração controlo orçamental DMK (FBL3N)",
+        "identifier": "RPA013FIAR",
+        "description": "Processo RPA para extrair diariamente os lançamentos (partidas) individuais de clientes do SAP via transação FBL3N, aplicando layout padronizado e exportando para Excel/CSV.",
+        "version": "1.0.0",
+        "execMode": "daily",
+        "execTime": "20:00",
+        "owner": "DCP/DMK-BI",
+        "lastUpdated": "2025-10-03"
+    },
+    "client_number": [
+        "62170000",
+        "62179999",
+        "62981000",
+        "68821000"
+    ],
+    "client_number_type": {
+
+    },
+    "report": {
+        "from_mail": "dsi-suporte-rpa@cvt.cv",
+        "to": "joselito.coutinho@cvt.cv",
+        "cc": ["alertas.rpa@cvt.cv"],
+        "subject": "Extração controlo orçamental DMK (FBL3N)"
+    },
+    "error_report": {
+        "from_mail": "dsi-suporte-rpa@cvt.cv",
+        "to": "alertas.rpa@cvt.cv",
+        "subject": "Erro: Extração controlo orçamental DMK (FBL3N)"
+    },
+    "sap_app": {
+        "path": "saplogon.exe",
+        "client": "110",
+        "language": "PT",
+        "transaction_code": "FBL3N",
+        "env": "SAP_PRD",
+        "max_wait_time": 90,
+        "retry_interval": 3
+    },
+    "database": {
+        "sap": {
+            "table": "platforms",
+            "where": {
+                "clause": "identifier = %s",
+                "params": "SAP_PRD"
+            }
+        }
+    }
+}
