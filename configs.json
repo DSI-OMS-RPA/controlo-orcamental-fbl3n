@@ -15,12 +15,9 @@
         "62981000",
         "68821000"
     ],
-    "client_number_type": {
-
-    },
     "report": {
         "from_mail": "dsi-suporte-rpa@cvt.cv",
-        "to": "joselito.coutinho@cvt.cv",
+        "to": "DMK-BI@cvt.cv",
         "cc": ["alertas.rpa@cvt.cv"],
         "subject": "Extração controlo orçamental DMK (FBL3N)"
     },
